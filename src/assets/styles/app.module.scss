@@ -1,0 +1,50 @@
+@import './global.module.scss';
+
+.app {
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  box-sizing: border-box;
+  @include flex;
+  justify-content: center;
+  align-items: center;
+  @include no-select;
+
+  img {
+    max-width: 100dvw;
+    max-height: 100dvh;
+  }
+
+  canvas {
+    position: absolute;
+    display: none;
+  }
+
+  .soundmap {
+    position: absolute;
+    display: none;
+  }
+
+  .floorplan {
+    cursor: url("../img/ear-32.png") 32 32, pointer;
+  }
+
+  .modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    p {
+      color: white;
+    }
+  }
+
+}
+
