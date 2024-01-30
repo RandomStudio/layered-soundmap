@@ -39,7 +39,7 @@ export default defineConfig({
     rollupOptions: {
       plugins: [inject({ Buffer: ['Buffer', 'Buffer'], process: 'process' })]
     },
-    outDir: '../app/public/',
+    outDir: './public/',
     emptyOutDir: true,
   },
 })
