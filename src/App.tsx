@@ -2,6 +2,9 @@ import { MouseEvent, useRef, useState } from 'react';
 import styles from 'styles/app.module.scss';
 
 import urlImgFloorPlan from './assets/img/floorplan.png';
+import urlImgShadowClub from './assets/img/shadow-club.png';
+import urlImgShadowHome from './assets/img/shadow-home.png';
+import urlImgShadowStreet from './assets/img/shadow-street.png';
 import urlImgSoundMap from './assets/img/soundmap-blur-50.png';
 import urlSoundClub from './assets/mp3/club.mp3';
 import urlSoundHome from './assets/mp3/home.mp3';
@@ -12,9 +15,6 @@ const App = () => {
   const soundMapCanvas = useRef<HTMLCanvasElement>(null);
   const soundmap = useRef<HTMLImageElement>(null);
   const floorplan = useRef<HTMLImageElement>(null);
-  const shadowCanvasStreet = useRef<HTMLCanvasElement>(null);
-  const shadowCanvasHome = useRef<HTMLCanvasElement>(null);
-  const shadowCanvasClub = useRef<HTMLCanvasElement>(null);
   const soundStreet = useRef<HTMLAudioElement>(null);
   const soundHome = useRef<HTMLAudioElement>(null);
   const soundClub = useRef<HTMLAudioElement>(null);
@@ -39,71 +39,8 @@ const App = () => {
       return;
     }
     setSoundMapCtx(ctx);
-
-    drawShadowCanvases(ctx);
   }
 
-  const drawShadowCanvases = (soundMapCtx: CanvasRenderingContext2D) => {
-    if (!soundMapCtx || !soundMapCanvas.current || !shadowCanvasStreet.current || !shadowCanvasClub.current || !shadowCanvasHome.current) {
-      console.error(`Can't apply highlights; elements are missing.`);
-      console.log(
-        soundMapCtx,
-        soundMapCanvas.current,
-        shadowCanvasStreet.current,
-        shadowCanvasClub.current,
-        shadowCanvasHome.current
-      );
-      return;
-    }
-
-    // resize shadow canvases to match sound map
-    shadowCanvasClub.current!.width = soundMapCanvas.current!.width;
-    shadowCanvasClub.current!.height = soundMapCanvas.current!.height;
-    shadowCanvasStreet.current!.width = soundMapCanvas.current!.width;
-    shadowCanvasStreet.current!.height = soundMapCanvas.current!.height;
-    shadowCanvasHome.current!.width = soundMapCanvas.current!.width;
-    shadowCanvasHome.current!.height = soundMapCanvas.current!.height;
-
-    // get shadow map contexts
-    const ctxClub = shadowCanvasClub.current!.getContext('2d');
-    const ctxStreet = shadowCanvasStreet.current!.getContext('2d');
-    const ctxHome = shadowCanvasHome.current!.getContext('2d');
-    if (!ctxClub || !ctxStreet || !ctxHome) {
-      console.error(`Can't apply highlights; couldn't create rendering contexts.`);
-      return;
-    }
-
-    // get sound map pixels
-    const { width, height } = soundMapCanvas.current!;
-    const imageData = soundMapCtx.getImageData(0, 0, width, height);
-    
-    // create image datas to populate for shadow maps
-    const imageDataClub = ctxClub!.createImageData(imageData);
-    const imageDataStreet = ctxStreet!.createImageData(imageData);
-    const imageDataHome = ctxHome!.createImageData(imageData);
-
-    // set shadow map transparencies based on sound map color values
-    for (let i = 0; i < imageData.data.length; i += 4) {
-      // imageDataClub.data[i] = 0;
-      // imageDataClub.data[i + 1] = 0;
-      // imageDataClub.data[i + 2] = 0;
-      imageDataClub.data[i + 3] = imageData.data[i]; // alpha based on red channel
-
-      // imageDataStreet.data[i] = 0;
-      // imageDataStreet.data[i + 1] = 0;
-      // imageDataStreet.data[i + 2] = 0;
-      imageDataStreet.data[i + 3] = imageData.data[i + 1]; // alpha based on green channel
-
-      // imageDataHome.data[i] = 0;
-      // imageDataHome.data[i + 1] = 0;
-      // imageDataHome.data[i + 2] = 0;
-      imageDataHome.data[i + 3] = imageData.data[i + 2]; // alpha based on blue channel
-    }
-
-    ctxClub.putImageData(imageDataClub, 0, 0);
-    ctxStreet.putImageData(imageDataStreet, 0, 0);
-    ctxHome.putImageData(imageDataHome, 0, 0);
-  }
 
   const start = () => {
     soundClub.current?.play();
@@ -200,17 +137,17 @@ const App = () => {
             height: floorplan.current?.getBoundingClientRect()?.height,
           }}
         >
-          <canvas
-            ref={shadowCanvasClub}
-            style={{ filter: `opacity(${0.3 * (1.0 - sampledColor[0] / 255.0)})` }}
+          <img
+            src={urlImgShadowClub}
+            style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[0] / 255.0)})` }}
           />
-          <canvas
-            ref={shadowCanvasStreet}
-            style={{ filter: `opacity(${0.3 * (1.0 - sampledColor[1] / 255.0)})` }}
+          <img
+            src={urlImgShadowStreet}
+            style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[1] / 255.0)})` }}
           />
-          <canvas
-            ref={shadowCanvasHome}
-            style={{ filter: `opacity(${0.3 * (1.0 - sampledColor[2] / 255.0)})` }}
+          <img
+            src={urlImgShadowHome}
+            style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[2] / 255.0)})` }}
           />
         </div>
       </div>
