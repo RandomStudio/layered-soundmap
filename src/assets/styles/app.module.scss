@@ -73,6 +73,7 @@
     justify-content: flex-start;
     align-items: center;
     color: black;
+    filter: grayscale(1) contrast(2);
 
     span {
       margin-right: 0.5em;

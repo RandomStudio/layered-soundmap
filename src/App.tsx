@@ -163,7 +163,7 @@ const App = () => {
       )}
 
       <div className={styles.footer}>
-        <span>Volume</span>
+        <span>VOLUME</span>
         <input
           type="range"
           min="0"
