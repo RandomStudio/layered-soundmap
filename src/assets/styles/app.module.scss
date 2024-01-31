@@ -5,28 +5,51 @@
   height: 100%;
   padding: 1em;
   box-sizing: border-box;
-  @include flex;
+  @include flex-column;
   justify-content: center;
   align-items: center;
   @include no-select;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 
-  img {
-    max-width: 100dvw;
-    max-height: 100dvh;
+  .map {
+    width: 100%;
+    height: 100%;
+    @include flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+
+    img {
+      max-width: 100dvw;
+      max-height: 100dvh;
+    }
+
+    canvas {
+      position: absolute;
+      display: none;
+    }
+
+    .soundmap {
+      position: absolute;
+      display: none;
+    }
+
+    .floorplan {
+      cursor: url("../img/ear-32.png") 32 32, pointer;
+    }
   }
 
-  canvas {
-    position: absolute;
-    display: none;
-  }
+  .footer {
+    width: 100%;
+    padding: 0.5em;
+    @include flex-row;
+    justify-content: flex-start;
+    align-items: center;
+    color: black;
 
-  .soundmap {
-    position: absolute;
-    display: none;
-  }
-
-  .floorplan {
-    cursor: url("../img/ear-32.png") 32 32, pointer;
+    span {
+      margin-right: 0.5em;
+    }
   }
 
   .modal {
@@ -45,6 +68,5 @@
       color: white;
     }
   }
-
 }
 

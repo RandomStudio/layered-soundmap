@@ -17,7 +17,9 @@ const App = () => {
   const soundClub = useRef<HTMLAudioElement>(null);
 
   const [ isPlaying, setIsPlaying ] = useState(false);
-  const [ ctx, setCtx ] = useState<CanvasRenderingContext2D | null>(null)
+  const [ ctx, setCtx ] = useState<CanvasRenderingContext2D | null>(null);
+  const [ sampledColor, setSampledColor ] = useState<Uint8ClampedArray>(new Uint8ClampedArray(4).fill(0));
+  const [ volume, setVolume ] = useState(0.5);
 
   const drawSoundMap = () => {
     if (!canvas.current || !soundmap.current) {
@@ -49,48 +51,43 @@ const App = () => {
       const x = event.pageX - rect.left;
       const y = event.pageY - rect.top;
 
-      setVolumesFromColor(
-        ctx.getImageData(
-          Math.round(ctx.canvas.width * x / rect.width),
-          Math.round(ctx.canvas.height * y / rect.height),
-          1,
-          1
-        ).data
+      sampleColor(
+        x / rect.width,
+        y / rect.height
       );
     }
   }
 
-  const setVolumesFromColor = (color: Uint8ClampedArray) => {
-    const [ r, g, b ] = color;
+  const sampleColor = (x: number, y: number) => {
+    if (ctx) {
+      setSampledColor(
+        ctx.getImageData(
+          Math.round(ctx.canvas.width * x),
+          Math.round(ctx.canvas.height * y),
+          1,
+          1
+        ).data
+      );
+      updateVolumes();
+    }
+  }
+
+  const updateVolumes = () => {
+    const [ r, g, b ] = sampledColor;
     if (soundClub.current) {
-      soundClub.current!.volume = r / 255.0;
+      soundClub.current!.volume = volume * r / 255.0;
     }
     if (soundStreet.current) {
-      soundStreet.current!.volume = g / 255.0;
+      soundStreet.current!.volume = volume * g / 255.0;
     }
     if (soundHome.current) {
-      soundHome.current!.volume = b / 255.0;
+      soundHome.current!.volume = volume * b / 255.0;
     }
   }
 
   return (
     <div className={styles.app}>
-      <canvas
-        ref={canvas}
-        className={styles.canvas}
-      />
-      <img
-        ref={soundmap}
-        className={styles.soundmap}
-        src={urlImgSoundMap}
-        onLoad={drawSoundMap}
-      />
-      <img
-        ref={floorplan}
-        className={styles.floorplan}
-        src={urlImgFloorPlan}
-        onMouseMove={onMouseMove}
-      />
+
       <audio
         ref={soundStreet}
         src={urlSoundStreet}
@@ -109,6 +106,39 @@ const App = () => {
         loop
         preload="auto"
       />
+
+      <div className={styles.map}>
+        <canvas
+          ref={canvas}
+          className={styles.canvas}
+        />
+        <img
+          ref={soundmap}
+          className={styles.soundmap}
+          src={urlImgSoundMap}
+          onLoad={drawSoundMap}
+        />
+        <img
+          ref={floorplan}
+          className={styles.floorplan}
+          src={urlImgFloorPlan}
+          onMouseMove={onMouseMove}
+        />
+      </div>
+
+      <div className={styles.footer}>
+        <span>Volume</span>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={volume * 100.0}
+          onChange={e => {
+            setVolume(Number(e.target.value) / 100.0);
+            updateVolumes();
+          }}
+        />
+      </div>
 
       { !isPlaying && (
         <div className={styles.modal} onClick={start}>
