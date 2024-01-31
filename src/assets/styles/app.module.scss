@@ -88,18 +88,15 @@
       margin-right: 0.5em;
     }
 
-    input[type=range] {
-      appearance: slider-horizontal;
-      -webkit-appearance: slider-horizontal;
+    // input[type=range] {
+    //   > * {
+    //     border-radius: 0;
+    //   }
 
-      > * {
-        border-radius: 0;
-      }
-
-      &::webkit-slider-runnable-track, &::webkit-slider-thumb {
-        border-radius: 0;
-      }
-    }
+    //   &::webkit-slider-runnable-track, &::webkit-slider-thumb {
+    //     border-radius: 0;
+    //   }
+    // }
   }
 
   .modal {
