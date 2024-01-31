@@ -20,6 +20,7 @@ const App = () => {
   const soundClub = useRef<HTMLAudioElement>(null);
 
   const [ isPlaying, setIsPlaying ] = useState(false);
+  const [ hasSoundStarted, setHasSoundStarted ] = useState(false);
   const [ soundMapCtx, setSoundMapCtx ] = useState<CanvasRenderingContext2D | null>(null);
   const [ sampledColor, setSampledColor ] = useState<Uint8ClampedArray>(new Uint8ClampedArray(4).fill(0));
   const [ volume, setVolume ] = useState(0.5);
@@ -47,6 +48,10 @@ const App = () => {
     soundHome.current?.play();
     soundStreet.current?.play();
     setIsPlaying(true);
+  }
+
+  const onSoundPlaybackStarted = () => {
+    setTimeout(() =>  setHasSoundStarted(true), 50);
   }
 
   const onMouseMove = (event: MouseEvent<HTMLImageElement>) => {
@@ -109,6 +114,7 @@ const App = () => {
         src={urlSoundClub}
         loop
         preload="auto"
+        onPlay={onSoundPlaybackStarted}
       />
 
       <div className={styles.map}>
@@ -151,6 +157,10 @@ const App = () => {
           />
         </div>
       </div>
+
+      { hasSoundStarted && (
+        <div className={styles.beat} />
+      )}
 
       <div className={styles.footer}>
         <span>Volume</span>
