@@ -1,6 +1,7 @@
 import { MouseEvent, useRef, useState } from 'react';
 import styles from 'styles/app.module.scss';
 
+import urlImageCursor from './assets/img/ear-32.png';
 import urlImgFloorPlan from './assets/img/floorplan.png';
 import urlImgShadowClub from './assets/img/shadow-club.png';
 import urlImgShadowHome from './assets/img/shadow-home.png';
@@ -9,6 +10,11 @@ import urlImgSoundMap from './assets/img/soundmap-blur-50.png';
 import urlSoundClub from './assets/mp3/club.mp3';
 import urlSoundHome from './assets/mp3/home.mp3';
 import urlSoundStreet from './assets/mp3/street.mp3';
+
+interface Point {
+  x: number
+  y: number
+}
 
 const App = () => {
 
@@ -24,6 +30,7 @@ const App = () => {
   const [ soundMapCtx, setSoundMapCtx ] = useState<CanvasRenderingContext2D | null>(null);
   const [ sampledColor, setSampledColor ] = useState<Uint8ClampedArray>(new Uint8ClampedArray(4).fill(0));
   const [ volume, setVolume ] = useState(0.5);
+  const [ mousePos, setMousePos ] = useState<Point>({ x: 0, y: 0 });
 
   const drawSoundMap = () => {
     if (!soundMapCanvas.current || !soundmap.current) {
@@ -42,7 +49,6 @@ const App = () => {
     setSoundMapCtx(ctx);
   }
 
-
   const start = () => {
     soundClub.current?.play();
     soundHome.current?.play();
@@ -59,6 +65,8 @@ const App = () => {
       const rect = floorplan.current!.getBoundingClientRect();
       const x = event.pageX - rect.left;
       const y = event.pageY - rect.top;
+
+      setMousePos({ x, y });
 
       sampleColor(
         x / rect.width,
@@ -156,6 +164,11 @@ const App = () => {
             style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[2] / 255.0)})` }}
           />
         </div>
+        <img
+          src={urlImageCursor}
+          className={`${styles.cursor} ${hasSoundStarted ? styles.animating : ''}`}
+          style={{ left: `${mousePos.x - 16}px`, top: `${mousePos.y - 16}px` }}
+        />
       </div>
 
       { hasSoundStarted && (
