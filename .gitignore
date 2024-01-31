@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 public
+src/assets/img/old
+src/assets/img/new
