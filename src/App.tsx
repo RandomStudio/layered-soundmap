@@ -80,8 +80,8 @@ const App = () => {
     event.preventDefault();
     if (isPlaying && floorplan.current && soundMapCtx) {
       const rect = floorplan.current!.getBoundingClientRect();
-      const x = event.touches[0].clientX - rect.left;
-      const y = event.touches[0].clientY - rect.top;
+      const x = event.touches[0].pageX - rect.left;
+      const y = event.touches[0].pageY - rect.top;
 
       // setMousePos({ x, y });
 
