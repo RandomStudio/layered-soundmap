@@ -76,6 +76,8 @@ const App = () => {
   }
 
   const onTouchMove = (event: TouchEvent<HTMLImageElement>) => {
+    event.stopPropagation();
+    event.preventDefault();
     if (isPlaying && floorplan.current && soundMapCtx) {
       const rect = floorplan.current!.getBoundingClientRect();
       const x = event.touches[0].clientX - rect.left;
