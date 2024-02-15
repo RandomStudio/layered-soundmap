@@ -27,6 +27,11 @@
     justify-content: center;
     align-items: center;
     flex-grow: 1;
+    @include no-select;
+
+    img {
+      @include no-select;
+    }
 
     .hidden {
       position: absolute;
