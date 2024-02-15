@@ -38,3 +38,7 @@
   -ms-user-select: none;
   user-select: none;
 }
+
+@mixin no-drag {
+  -webkit-user-drag: none;
+}

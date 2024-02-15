@@ -144,6 +144,7 @@ const App = () => {
         <img
           ref={soundmap}
           className={styles.hidden}
+          draggable={false}
           src={urlImgSoundMap}
           onLoad={drawSoundMap}
         />
@@ -154,6 +155,7 @@ const App = () => {
         <img
           ref={floorplan}
           className={styles.floorplan}
+          draggable={false}
           src={urlImgFloorPlan}
           onMouseMove={onMouseMove}
           onTouchStart={onTouchMove}
@@ -170,14 +172,17 @@ const App = () => {
         >
           <img
             src={urlImgShadowClub}
+            draggable={false}
             style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[0] / 255.0)})` }}
           />
           <img
             src={urlImgShadowStreet}
+            draggable={false}
             style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[1] / 255.0)})` }}
           />
           <img
             src={urlImgShadowHome}
+            draggable={false}
             style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[2] / 255.0)})` }}
           />
         </div>
