@@ -32,6 +32,7 @@
     img {
       @include no-select;
       @include no-drag;
+      -webkit-touch-callout: none !important;
     }
 
     .hidden {
