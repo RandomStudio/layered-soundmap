@@ -5,6 +5,7 @@ html, body {
   height: 100%;
   overscroll-behavior: none;
   -webkit-touch-callout: none !important;
+  touch-action: none;
 }
 
 body {
