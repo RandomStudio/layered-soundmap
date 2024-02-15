@@ -17,6 +17,11 @@ import AudioPipeline from './components/AudioPipeline';
 //   y: number
 // }
 
+const isTouchEnabled = () => (
+  ( 'ontouchstart' in window ) || 
+  ( navigator.maxTouchPoints > 0 )
+);
+
 const App = () => {
 
   const soundMapCanvas = useRef<HTMLCanvasElement>(null);
@@ -218,7 +223,16 @@ const App = () => {
 
       { !isPlaying && (
         <div className={styles.modal} onClick={start}>
-          <p>Click to start</p>
+          { isTouchEnabled() && (
+            <>
+              <p>Tap to start</p>
+              <p>Move to control</p>
+              <div className={styles.move} />
+            </>
+          )}
+          { !isTouchEnabled() && (
+            <p>Click to start</p>
+          )}
         </div>
       )}
     </div>

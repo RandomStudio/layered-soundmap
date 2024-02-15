@@ -1,14 +1,5 @@
 @import './global.module.scss';
 
-@keyframes indicate-beat {
-  0% {
-    transform: scale(1.75, 1.75);
-  }
-  100% {
-    transform: scale(1.0, 1.0);
-  }
-}
-
 .app {
   width: 100%;
   height: 100%;
@@ -165,13 +156,43 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.5);
-    display: flex;
+    @include flex-column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
 
     p {
       color: white;
+
+      &:first-child {
+        margin-bottom: 0;
+      }
     }
+
+    .move {
+      width: 64px;
+      height: 64px;
+      background: url(../img/touch.png);
+      background-size: contain;
+      animation: ease-in-out 1s infinite alternate side-to-side;
+    }
+  }
+}
+
+@keyframes indicate-beat {
+  0% {
+    transform: scale(1.75, 1.75);
+  }
+  100% {
+    transform: scale(1.0, 1.0);
+  }
+}
+
+@keyframes side-to-side {
+  0% {
+    transform: translateX(-32px) rotateZ(-10deg);
+  }
+  100% {
+    transform: translateX(32px) translateY(46px) rotateZ(10deg);
   }
 }
