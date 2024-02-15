@@ -1,4 +1,4 @@
-import { MouseEvent, TouchEvent, useRef, useState } from 'react';
+import { MouseEvent, TouchEvent, useMemo, useRef, useState } from 'react';
 import styles from 'styles/app.module.scss';
 
 import urlImgFloorPlan from './assets/img/floorplan.png';
@@ -9,6 +9,7 @@ import urlImgSoundMap from './assets/img/soundmap-blur-50.png';
 import urlSoundClub from './assets/mp3/club.mp3';
 import urlSoundHome from './assets/mp3/home.mp3';
 import urlSoundStreet from './assets/mp3/street.mp3';
+import AudioPipeline from './components/AudioPipeline';
 
 // import urlImageCursor from './assets/img/ear-32.png';
 // interface Point {
@@ -25,8 +26,9 @@ const App = () => {
   const soundHome = useRef<HTMLAudioElement>(null);
   const soundClub = useRef<HTMLAudioElement>(null);
 
+  const audio = useMemo(() => new AudioPipeline(), []);
+
   const [ isPlaying, setIsPlaying ] = useState(false);
-  const [ hasSoundStarted, setHasSoundStarted ] = useState(false);
   const [ soundMapCtx, setSoundMapCtx ] = useState<CanvasRenderingContext2D | null>(null);
   const [ sampledColor, setSampledColor ] = useState<Uint8ClampedArray>(new Uint8ClampedArray(4).fill(0));
   const [ volume, setVolume ] = useState(0.5);
@@ -50,15 +52,16 @@ const App = () => {
   }
 
   const start = () => {
-    soundClub.current?.play();
-    soundHome.current?.play();
-    soundStreet.current?.play();
+    audio.addTrack(soundClub.current!);
+    audio.addTrack(soundHome.current!);
+    audio.addTrack(soundStreet.current!);
+    audio.start();
     setIsPlaying(true);
   }
 
-  const onSoundPlaybackStarted = () => {
-    setTimeout(() =>  setHasSoundStarted(true), 50);
-  }
+  // const onSoundPlaybackStarted = () => {
+  //   setTimeout(() =>  setHasSoundStarted(true), 50);
+  // }
 
   const onMouseMove = (event: MouseEvent<HTMLImageElement>) => {
     if (isPlaying && floorplan.current && soundMapCtx) {
@@ -105,17 +108,17 @@ const App = () => {
       updateVolumes();
     }
   }
-
+  
   const updateVolumes = () => {
     const [ r, g, b ] = sampledColor;
     if (soundClub.current) {
-      soundClub.current!.volume = volume * r / 255.0;
+      audio.getTrack(soundClub.current)!.volume = volume * r / 255.0;
     }
     if (soundStreet.current) {
-      soundStreet.current!.volume = volume * g / 255.0;
+      audio.getTrack(soundStreet.current)!.volume = volume * g / 255.0;
     }
     if (soundHome.current) {
-      soundHome.current!.volume = volume * b / 255.0;
+      audio.getTrack(soundHome.current)!.volume = volume * b / 255.0;
     }
   }
 
@@ -139,7 +142,7 @@ const App = () => {
         src={urlSoundClub}
         loop
         preload="auto"
-        onPlay={onSoundPlaybackStarted}
+        // onPlay={onSoundPlaybackStarted}
       />
 
       <div className={styles.map}>
@@ -195,7 +198,7 @@ const App = () => {
         /> */}
       </div>
 
-      { hasSoundStarted && (
+      { isPlaying && (
         <div className={styles.beat} />
       )}
 
