@@ -1,4 +1,4 @@
-import { MouseEvent, useRef, useState } from 'react';
+import { MouseEvent, TouchEvent, useRef, useState } from 'react';
 import styles from 'styles/app.module.scss';
 
 import urlImgFloorPlan from './assets/img/floorplan.png';
@@ -75,6 +75,21 @@ const App = () => {
     }
   }
 
+  const onTouchMove = (event: TouchEvent<HTMLImageElement>) => {
+    if (isPlaying && floorplan.current && soundMapCtx) {
+      const rect = floorplan.current!.getBoundingClientRect();
+      const x = event.touches[0].clientX - rect.left;
+      const y = event.touches[0].clientY - rect.top;
+
+      // setMousePos({ x, y });
+
+      sampleColor(
+        x / rect.width,
+        y / rect.height
+      );
+    }
+  }
+
   const sampleColor = (x: number, y: number) => {
     if (soundMapCtx) {
       setSampledColor(
@@ -141,6 +156,8 @@ const App = () => {
           className={styles.floorplan}
           src={urlImgFloorPlan}
           onMouseMove={onMouseMove}
+          onTouchStart={onTouchMove}
+          onTouchMove={onTouchMove}
         />
         <div
           className={styles.shadows}
