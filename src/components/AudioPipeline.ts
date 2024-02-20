@@ -1,3 +1,5 @@
+import { AudioTrackType } from '@/types';
+
 import AudioTrack from './AudioTrack';
 
 export default class AudioPipeline {
@@ -9,18 +11,35 @@ export default class AudioPipeline {
     this._tracks = [];
   }
 
-  addTrack = (element: HTMLAudioElement) => {
-    const track = new AudioTrack(this._context, element);
-    this._tracks.push(track);
-    track.connect(this._context.destination);
+  addTrack = (type: AudioTrackType, element: HTMLAudioElement) => {
+    if (!this.getTracksByElement(element).length) {
+      const track = new AudioTrack(type, this._context, element);
+      this._tracks.push(track);
+      track.connect(this._context.destination);
+    }
   }
 
-  getTrack = (element: HTMLAudioElement) => (
-    this._tracks.find(t => t.hasElement(element))
+  getTracksByElement = (element: HTMLAudioElement): Array<AudioTrack> => (
+    this._tracks.filter(t => t.hasElement(element))
   );
+
+  getTracksByType = (type: AudioTrackType): Array<AudioTrack> => (
+    this._tracks.filter(t => t.type === type)
+  );
+
+  areAllTracksLoaded = (): boolean => {
+    this._tracks.forEach(t => console.log('\t', t.type, t.canPlayThrough));
+    return this._tracks.reduce((loaded, track) => (
+      loaded && track.canPlayThrough
+    ), true);
+  }
 
   start = () => {
     this._context.resume();
     this._tracks.forEach(t => t.play());
+  }
+
+  seek = (position: number) => {
+    this._tracks.forEach(t => t.seek(position));
   }
 }

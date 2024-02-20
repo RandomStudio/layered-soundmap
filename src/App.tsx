@@ -10,6 +10,7 @@ import urlSoundClub from './assets/mp3/club.mp3';
 import urlSoundHome from './assets/mp3/home.mp3';
 import urlSoundStreet from './assets/mp3/street.mp3';
 import AudioPipeline from './components/AudioPipeline';
+import { AudioTrackType } from './types';
 
 // import urlImageCursor from './assets/img/ear-32.png';
 // interface Point {
@@ -33,11 +34,11 @@ const App = () => {
 
   const audio = useMemo(() => new AudioPipeline(), []);
 
+  const [ allSoundsLoaded, setAllSoundsLoaded ] = useState(false);
   const [ isPlaying, setIsPlaying ] = useState(false);
   const [ soundMapCtx, setSoundMapCtx ] = useState<CanvasRenderingContext2D | null>(null);
   const [ sampledColor, setSampledColor ] = useState<Uint8ClampedArray>(new Uint8ClampedArray(4).fill(0));
   const [ volume, setVolume ] = useState(0.5);
-  // const [ mousePos, setMousePos ] = useState<Point>({ x: 0, y: 0 });
 
   const drawSoundMap = () => {
     if (!soundMapCanvas.current || !soundmap.current) {
@@ -56,29 +57,33 @@ const App = () => {
     setSoundMapCtx(ctx);
   }
 
-  const start = () => {
-    audio.addTrack(soundClub.current!);
-    audio.addTrack(soundHome.current!);
-    audio.addTrack(soundStreet.current!);
-    audio.start();
-    setIsPlaying(true);
+  const onLoadAudio = () => {
+    if (isPlaying) {
+      setAllSoundsLoaded(audio.areAllTracksLoaded());
+      if (audio.areAllTracksLoaded()) {
+        audio.seek(0);
+      }
+    }
   }
 
-  // const onSoundPlaybackStarted = () => {
-  //   setTimeout(() =>  setHasSoundStarted(true), 50);
-  // }
+  const start = () => {
+    audio.addTrack(AudioTrackType.CLUB, soundClub.current!);
+    audio.addTrack(AudioTrackType.HOME, soundHome.current!);
+    audio.addTrack(AudioTrackType.STREET, soundStreet.current!);
+    setIsPlaying(true);
+    audio.start();
+    setAllSoundsLoaded(audio.areAllTracksLoaded());
+    if (allSoundsLoaded) {
+      audio.seek(0);
+    }
+  }
 
   const onMouseMove = (event: MouseEvent<HTMLImageElement>) => {
     if (isPlaying && floorplan.current && soundMapCtx) {
       const rect = floorplan.current!.getBoundingClientRect();
-      const x = event.pageX - rect.left;
-      const y = event.pageY - rect.top;
-
-      // setMousePos({ x, y });
-
       sampleColor(
-        x / rect.width,
-        y / rect.height
+        (event.pageX - rect.left) / rect.width,
+        (event.pageY - rect.top) / rect.height
       );
     }
   }
@@ -88,14 +93,9 @@ const App = () => {
     event.preventDefault();
     if (isPlaying && floorplan.current && soundMapCtx) {
       const rect = floorplan.current!.getBoundingClientRect();
-      const x = event.touches[0].pageX - rect.left;
-      const y = event.touches[0].pageY - rect.top;
-
-      // setMousePos({ x, y });
-
       sampleColor(
-        x / rect.width,
-        y / rect.height
+        (event.touches[0].pageX - rect.left) / rect.width,
+        (event.touches[0].pageY - rect.top) / rect.height
       );
     }
   }
@@ -116,15 +116,9 @@ const App = () => {
   
   const updateVolumes = () => {
     const [ r, g, b ] = sampledColor;
-    if (soundClub.current) {
-      audio.getTrack(soundClub.current)!.volume = volume * r / 255.0;
-    }
-    if (soundStreet.current) {
-      audio.getTrack(soundStreet.current)!.volume = volume * g / 255.0;
-    }
-    if (soundHome.current) {
-      audio.getTrack(soundHome.current)!.volume = volume * b / 255.0;
-    }
+    audio.getTracksByType(AudioTrackType.CLUB).forEach(t => t.volume = volume * r / 255.0);
+    audio.getTracksByType(AudioTrackType.STREET).forEach(t => t.volume = volume * g / 255.0);
+    audio.getTracksByType(AudioTrackType.HOME).forEach(t => t.volume = volume * b / 255.0);
   }
 
   return (
@@ -135,19 +129,21 @@ const App = () => {
         src={urlSoundStreet}
         loop
         preload="auto"
+        onCanPlayThrough={() => onLoadAudio()}
       />
       <audio
         ref={soundHome}
         src={urlSoundHome}
         loop
         preload="auto"
+        onCanPlayThrough={() => onLoadAudio()}
       />
       <audio
         ref={soundClub}
         src={urlSoundClub}
         loop
         preload="auto"
-        // onPlay={onSoundPlaybackStarted}
+        onCanPlayThrough={() => onLoadAudio()}
       />
 
       <div className={styles.map}>
@@ -220,6 +216,12 @@ const App = () => {
           }}
         />
       </div>
+
+      { !allSoundsLoaded && (
+        <div className={styles.modal}>
+          <div className={styles.loader} />
+        </div>
+      )}
 
       { !isPlaying && (
         <div className={styles.modal} onClick={start}>
