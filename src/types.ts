@@ -1,5 +1,6 @@
 export enum AudioTrackType {
-  CLUB,
-  STREET,
-  HOME,
+  DOUX,
+  REVE,
+  YOU,
+  AMBIENCE
 }

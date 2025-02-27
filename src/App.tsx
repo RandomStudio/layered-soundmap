@@ -2,13 +2,14 @@ import { MouseEvent, TouchEvent, useMemo, useRef, useState } from 'react';
 import styles from 'styles/app.module.scss';
 
 import urlImgFloorPlan from './assets/img/floorplan.png';
-import urlImgShadowClub from './assets/img/shadow-club.png';
-import urlImgShadowHome from './assets/img/shadow-home.png';
-import urlImgShadowStreet from './assets/img/shadow-street.png';
+import urlImgShadowDoux from './assets/img/shadow-doux.png';
+import urlImgShadowReve from './assets/img/shadow-reve.png';
+import urlImgShadowYou from './assets/img/shadow-you.png';
 import urlImgSoundMap from './assets/img/soundmap-blur-50.png';
-import urlSoundClub from './assets/mp3/club.mp3';
-import urlSoundHome from './assets/mp3/home.mp3';
-import urlSoundStreet from './assets/mp3/street.mp3';
+import urlSoundDoux from './assets/wav/Doux.wav';
+import urlSoundReve from './assets/wav/Reve.wav';
+import urlSoundYou from './assets/wav/You.wav';
+import urlSoundAmbience from './assets/wav/Ambience.wav';
 import AudioPipeline from './components/AudioPipeline';
 import { AudioTrackType } from './types';
 
@@ -19,8 +20,8 @@ import { AudioTrackType } from './types';
 // }
 
 const isTouchEnabled = () => (
-  ( 'ontouchstart' in window ) || 
-  ( navigator.maxTouchPoints > 0 )
+  ('ontouchstart' in window) ||
+  (navigator.maxTouchPoints > 0)
 );
 
 const App = () => {
@@ -28,17 +29,19 @@ const App = () => {
   const soundMapCanvas = useRef<HTMLCanvasElement>(null);
   const soundmap = useRef<HTMLImageElement>(null);
   const floorplan = useRef<HTMLImageElement>(null);
-  const soundStreet = useRef<HTMLAudioElement>(null);
-  const soundHome = useRef<HTMLAudioElement>(null);
-  const soundClub = useRef<HTMLAudioElement>(null);
+  const soundDoux = useRef<HTMLAudioElement>(null);
+  const soundReve = useRef<HTMLAudioElement>(null);
+  const soundYou = useRef<HTMLAudioElement>(null);
+  const soundAmbience = useRef<HTMLAudioElement>(null);
 
   const audio = useMemo(() => new AudioPipeline(), []);
 
-  const [ allSoundsLoaded, setAllSoundsLoaded ] = useState(false);
-  const [ isPlaying, setIsPlaying ] = useState(false);
-  const [ soundMapCtx, setSoundMapCtx ] = useState<CanvasRenderingContext2D | null>(null);
-  const [ sampledColor, setSampledColor ] = useState<Uint8ClampedArray>(new Uint8ClampedArray(4).fill(0));
-  const [ volume, setVolume ] = useState(0.5);
+  const [allSoundsLoaded, setAllSoundsLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [soundMapCtx, setSoundMapCtx] = useState<CanvasRenderingContext2D | null>(null);
+  const [sampledColor, setSampledColor] = useState<Uint8ClampedArray>(new Uint8ClampedArray(4).fill(0));
+  const [volume, setVolume] = useState(0.5);
+  const [volumeAmbience, setVolumeAmbience] = useState(0.5);
 
   const drawSoundMap = () => {
     if (!soundMapCanvas.current || !soundmap.current) {
@@ -67,12 +70,14 @@ const App = () => {
   }
 
   const start = () => {
-    audio.addTrack(AudioTrackType.CLUB, soundClub.current!);
-    audio.addTrack(AudioTrackType.HOME, soundHome.current!);
-    audio.addTrack(AudioTrackType.STREET, soundStreet.current!);
+    audio.addTrack(AudioTrackType.DOUX, soundDoux.current!);
+    audio.addTrack(AudioTrackType.REVE, soundReve.current!);
+    audio.addTrack(AudioTrackType.YOU, soundYou.current!);
+    audio.addTrack(AudioTrackType.AMBIENCE, soundAmbience.current!);
     setIsPlaying(true);
     audio.start();
     setAllSoundsLoaded(audio.areAllTracksLoaded());
+    updateVolumes();
     if (allSoundsLoaded) {
       audio.seek(0);
     }
@@ -113,34 +118,42 @@ const App = () => {
       updateVolumes();
     }
   }
-  
+
   const updateVolumes = () => {
-    const [ r, g, b ] = sampledColor;
-    audio.getTracksByType(AudioTrackType.CLUB).forEach(t => t.volume = volume * r / 255.0);
-    audio.getTracksByType(AudioTrackType.STREET).forEach(t => t.volume = volume * g / 255.0);
-    audio.getTracksByType(AudioTrackType.HOME).forEach(t => t.volume = volume * b / 255.0);
+    const [r, g, b] = sampledColor;
+    audio.getTracksByType(AudioTrackType.DOUX).forEach(t => t.volume = volume * r / 255.0);
+    audio.getTracksByType(AudioTrackType.REVE).forEach(t => t.volume = volume * g / 255.0);
+    audio.getTracksByType(AudioTrackType.YOU).forEach(t => t.volume = volume * b / 255.0);
+    audio.getTracksByType(AudioTrackType.AMBIENCE).forEach(t => t.volume = volume * volumeAmbience);
   }
 
   return (
     <div className={styles.app}>
 
       <audio
-        ref={soundStreet}
-        src={urlSoundStreet}
+        ref={soundDoux}
+        src={urlSoundDoux}
         loop
         preload="auto"
         onCanPlayThrough={() => onLoadAudio()}
       />
       <audio
-        ref={soundHome}
-        src={urlSoundHome}
+        ref={soundReve}
+        src={urlSoundReve}
         loop
         preload="auto"
         onCanPlayThrough={() => onLoadAudio()}
       />
       <audio
-        ref={soundClub}
-        src={urlSoundClub}
+        ref={soundYou}
+        src={urlSoundYou}
+        loop
+        preload="auto"
+        onCanPlayThrough={() => onLoadAudio()}
+      />
+      <audio
+        ref={soundAmbience}
+        src={urlSoundAmbience}
         loop
         preload="auto"
         onCanPlayThrough={() => onLoadAudio()}
@@ -177,17 +190,17 @@ const App = () => {
           }}
         >
           <img
-            src={urlImgShadowClub}
+            src={urlImgShadowDoux}
             draggable={false}
             style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[0] / 255.0)})` }}
           />
           <img
-            src={urlImgShadowStreet}
+            src={urlImgShadowReve}
             draggable={false}
             style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[1] / 255.0)})` }}
           />
           <img
-            src={urlImgShadowHome}
+            src={urlImgShadowYou}
             draggable={false}
             style={{ filter: `opacity(${0.6 * (1.0 - sampledColor[2] / 255.0)})` }}
           />
@@ -199,40 +212,55 @@ const App = () => {
         /> */}
       </div>
 
-      { isPlaying && (
+      {isPlaying && (
         <div className={styles.beat} />
       )}
 
       <div className={styles.footer}>
-        <span>VOLUME</span>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={volume * 100.0}
-          onChange={e => {
-            setVolume(Number(e.target.value) / 100.0);
-            updateVolumes();
-          }}
-        />
+        <div className={styles.volumeControl}>
+          <span>AMBIENCE VOLUME</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={volumeAmbience * 100.0}
+            onChange={e => {
+              setVolumeAmbience(Number(e.target.value) / 100.0);
+              updateVolumes();
+            }}
+          />
+        </div>
+        <div className={styles.volumeControl}>
+          <span>OVERALL VOLUME</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={volume * 100.0}
+            onChange={e => {
+              setVolume(Number(e.target.value) / 100.0);
+              updateVolumes();
+            }}
+          />
+        </div>
       </div>
 
-      { !allSoundsLoaded && (
+      {!allSoundsLoaded && (
         <div className={styles.modal}>
           <div className={styles.loader} />
         </div>
       )}
 
-      { !isPlaying && (
+      {!isPlaying && (
         <div className={styles.modal} onClick={start}>
-          { isTouchEnabled() && (
+          {isTouchEnabled() && (
             <>
               <p>Tap to start</p>
               <p>Move to control</p>
               <div className={styles.move} />
             </>
           )}
-          { !isTouchEnabled() && (
+          {!isTouchEnabled() && (
             <p>Click to start</p>
           )}
         </div>
