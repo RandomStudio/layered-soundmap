@@ -121,7 +121,7 @@ const App = () => {
 
   const updateVolumes = () => {
     const [r, g, b] = sampledColor;
-    audio.getTracksByType(AudioTrackType.DOUX).forEach(t => t.volume = 0.7 * volume * r / 255.0);
+    audio.getTracksByType(AudioTrackType.DOUX).forEach(t => t.volume = 0.3 * volume * r / 255.0);
     audio.getTracksByType(AudioTrackType.REVE).forEach(t => t.volume = volume * g / 255.0);
     audio.getTracksByType(AudioTrackType.YOU).forEach(t => t.volume = volume * b / 255.0);
     audio.getTracksByType(AudioTrackType.AMBIENCE).forEach(t => t.volume = volume * volumeAmbience);
